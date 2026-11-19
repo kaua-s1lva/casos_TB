@@ -1,0 +1,24 @@
+{
+  "modelo": "Árvore de decisão",
+  "hiperparametros": {
+    "class_weight": "balanced",
+    "criterion": "entropy",
+    "max_depth": 10,
+    "min_samples_leaf": 1000
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.7010474867929354,
+  "teste": {
+    "auc": 0.6975580304349723,
+    "sensibilidade (recall)": 0.6535421100638492,
+    "especificidade": 0.6333923146262478,
+    "precisao": 0.281348167539267,
+    "f1": 0.3933571232500686,
+    "vp": 4299,
+    "fp": 10981,
+    "vn": 18972,
+    "fn": 2279
+  },
+  "n_treino": 148830,
+  "n_teste": 36531
+}

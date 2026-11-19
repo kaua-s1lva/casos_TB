@@ -1,0 +1,23 @@
+{
+  "modelo": "Regressão logística",
+  "hiperparametros": {
+    "C": 0.1,
+    "class_weight": "balanced",
+    "regularizacao": "L1 (Lasso)"
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.7106779818232146,
+  "teste": {
+    "auc": 0.7066163030097106,
+    "sensibilidade (recall)": 0.6232897537245363,
+    "especificidade": 0.6825025873869062,
+    "precisao": 0.30124908155767816,
+    "f1": 0.4061818902318209,
+    "vp": 4100,
+    "fp": 9510,
+    "vn": 20443,
+    "fn": 2478
+  },
+  "n_treino": 148830,
+  "n_teste": 36531
+}

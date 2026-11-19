@@ -1,0 +1,22 @@
+﻿etapa;item;casos;percentual_da_base
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Casos na etapa;301959;100,0
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: ≤ 18 anos;17893;5,925638911242917
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: Imigrantes;1904;0,6305491805178849
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: Em situação de rua;8760;2,9010561036432096
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: Profissionais de saúde;3630;1,2021499607562616
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: Privados de liberdade;33839;11,206488298080203
+Casos novos de TB pulmonar notificados no SINAN (2018–2022);Excluído: Gestantes;1130;0,3742229905384506
+Adultos fora das populações especiais;Casos na etapa;234803;77,75989455522108
+Adultos fora das populações especiais;Excluído: Pulmonar + extrapulmonar;8716;2,8864845889673765
+Adultos com TB exclusivamente pulmonar;Casos na etapa;226087;74,8734099662537
+Adultos com TB exclusivamente pulmonar;Excluído: Resistência a droga de 1ª linha;2448;0,8107060892372805
+Adultos com TB exclusivamente pulmonar;Excluído: Sem tempo de tratamento;7375;2,4423845621425424
+TB pulmonar não resistente, com tempo de tratamento;Casos na etapa;216264;71,62031931487387
+TB pulmonar não resistente, com tempo de tratamento;Excluído: Transferência;10811;3,5802873900099024
+TB pulmonar não resistente, com tempo de tratamento;Excluído: Óbito (TB ou outras causas);17385;5,757404150894658
+TB pulmonar não resistente, com tempo de tratamento;Excluído: Mudança de esquema;1557;0,5156329170516527
+TB pulmonar não resistente, com tempo de tratamento;Excluído: TB-DR;984;0,3258720554777304
+TB pulmonar não resistente, com tempo de tratamento;Excluído: Falência;166;0,05497435082246266
+População de estudo;Total;185361;61,38614845061747
+População de estudo;Cura;156088;51,69178597094307
+População de estudo;Abandono (inclui primário);29273;9,694362479674393
