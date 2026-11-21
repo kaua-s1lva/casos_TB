@@ -6,21 +6,21 @@ Os critérios são os mesmos do WHERE de seleção, aplicados em sequência: cad
 caso é contado uma única vez, no primeiro critério que o exclui.
 
 Saídas na pasta reports/:
-  - fluxograma_selecao.png
-  - fluxograma_selecao.csv
+  - fluxograma_populacao_estudo.png
+  - fluxograma_populacao_estudo.csv
 
-Uso (dentro da pasta ia):  python src/visualization/fluxograma_selecao.py
+Uso (dentro da pasta ia):  python src/visualization/fluxograma_populacao_estudo.py
 """
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
-from src.db_manager import ConexaoBanco
+from src.banco_dados import ConexaoBanco
 from src.config import REPORTS
 
 PASTA_SAIDA = str(REPORTS)
 
-QUERY = """
+CONSULTA_NOTIFICACOES = """
     SELECT faixa_etaria, imigrante, sem_teto, profissional_saude, encarcerado,
            gestante, forma_clinica, teste_sensibilidade,
            tempo_entre_encerramento_e_inicio_tratamento,
@@ -112,7 +112,7 @@ def _pct(p):
     return f"{p:.1f}".replace(".", ",") + "%"
 
 
-def calcular_fluxo(df):
+def contar_exclusoes_por_etapa(df):
     """Aplica os critérios em sequência e devolve as contagens de cada etapa."""
     d = df
     etapas = []
@@ -131,7 +131,7 @@ def calcular_fluxo(df):
     return etapas, len(d), cura, len(d) - cura
 
 
-def desenhar(etapas, total, final, cura, abandono, caminho):
+def desenhar_fluxograma(etapas, total, final, cura, abandono, caminho):
     superficie, tinta, tinta2, borda = "#fcfcfb", "#0b0b0b", "#52514e", "#8f8e89"
     azul, laranja = "#2a78d6", "#eb6834"
 
@@ -202,20 +202,20 @@ def desenhar(etapas, total, final, cura, abandono, caminho):
     plt.close(fig)
 
 
-def gerar_fluxograma(db=None):
+def gerar_fluxograma_populacao_estudo(db=None):
     db = db or ConexaoBanco()
     print("[*] Extraindo dados da fNotificacao...")
-    df = db.obter_dataframe(QUERY)
+    df = db.consultar(CONSULTA_NOTIFICACOES)
     if df is None or df.empty:
         print("[X] Erro: Sem dados.")
         return
 
     total = len(df)
-    etapas, final, cura, abandono = calcular_fluxo(df)
+    etapas, final, cura, abandono = contar_exclusoes_por_etapa(df)
 
     os.makedirs(PASTA_SAIDA, exist_ok=True)
-    caminho = os.path.join(PASTA_SAIDA, "fluxograma_selecao.png")
-    desenhar(etapas, total, final, cura, abandono, caminho)
+    caminho = os.path.join(PASTA_SAIDA, "fluxograma_populacao_estudo.png")
+    desenhar_fluxograma(etapas, total, final, cura, abandono, caminho)
 
     linhas = []
     for titulo, n, excluidos in etapas:
@@ -227,7 +227,7 @@ def gerar_fluxograma(db=None):
                {"etapa": "População de estudo", "item": "Abandono (inclui primário)", "casos": abandono}]
     tab = pd.DataFrame(linhas)
     tab["percentual_da_base"] = tab["casos"] / total * 100
-    tab.to_csv(os.path.join(PASTA_SAIDA, "fluxograma_selecao.csv"), sep=";",
+    tab.to_csv(os.path.join(PASTA_SAIDA, "fluxograma_populacao_estudo.csv"), sep=";",
                decimal=",", index=False, encoding="utf-8-sig")
 
     for titulo, n, excluidos in etapas:
@@ -242,4 +242,4 @@ def gerar_fluxograma(db=None):
 
 
 if __name__ == "__main__":
-    gerar_fluxograma()
+    gerar_fluxograma_populacao_estudo()

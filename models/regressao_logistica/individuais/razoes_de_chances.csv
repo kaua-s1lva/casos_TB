@@ -1,0 +1,26 @@
+variavel;OR
+faixa_etaria_19 - 29 anos;3.0096376266859863
+faixa_etaria_30 - 39 anos;2.4107980131342894
+escolaridade_Ignorado;2.1826713960488227
+drogas_Sim;2.0965166406340043
+escolaridade_Até fundamental;2.051019141409778
+teste_hiv_Não realizado;2.0083266123483656
+teste_hiv_Positivo;1.942705174287048
+escolaridade_Analfabeto;1.918133587657545
+faixa_etaria_40 - 49 anos;1.8660285563000607
+faixa_etaria_Ignorado;1.818964641664972
+teste_hiv_Em andamento;1.7662063809192217
+teste_hiv_Ignorado;1.7042123162367786
+escolaridade_Ensino médio;1.4761315087938134
+tabagismo_Sim;1.3825478064737664
+sexo_Masculino;1.3764824295223255
+raca_Preta;1.3738834942517222
+faixa_etaria_50 - 59 anos;1.3164432027847712
+alcool_Sim;1.3128925471205108
+raca_Ignorado;1.2910086331316504
+drogas_Ignorado;1.1953959492685227
+raca_Parda;1.1530843586625097
+tabagismo_Ignorado;1.1127130787235529
+alcool_Ignorado;1.0148604889023578
+sexo_Ignorado;0.9524186515754883
+raca_Amarela/Indígena;0.894879828426662

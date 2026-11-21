@@ -1,0 +1,36 @@
+{
+  "modelo": "floresta_aleatoria",
+  "cenario": "Só individuais",
+  "data_execucao": "2026-11-21 15:21",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca"
+  ],
+  "hiperparametros": {
+    "max_depth": 20,
+    "min_samples_leaf": 50
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.7016096601558809,
+  "auc_validacao_cruzada_desvio": 0.0065559215811915,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.7016848210671432,
+    "Sensibilidade": 0.6284584980237155,
+    "Especificidade": 0.6688478616499182,
+    "Precisão": 0.29417206290471787,
+    "F1-Score": 0.4007561436672968,
+    "Acurácia": 0.6615751005994909
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

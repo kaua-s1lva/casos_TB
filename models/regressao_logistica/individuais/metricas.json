@@ -1,0 +1,36 @@
+{
+  "modelo": "regressao_logistica",
+  "cenario": "Só individuais",
+  "data_execucao": "2026-11-21 15:28",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca"
+  ],
+  "hiperparametros": {
+    "C": 0.1,
+    "l1_ratio": 0
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.6989666137351724,
+  "auc_validacao_cruzada_desvio": 0.00596729697138746,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.6983581336310032,
+    "Sensibilidade": 0.610063849194284,
+    "Especificidade": 0.6805662204119788,
+    "Precisão": 0.29548634121198736,
+    "F1-Score": 0.39813482811647405,
+    "Acurácia": 0.667871123155676
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

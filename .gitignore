@@ -137,3 +137,15 @@ desktop.ini
 # Power BI (contém os dados embutidos)
 *.pbix
 *.pdf
+
+# Resultados dos modelos (models/<modelo>/<cenário>/)
+# Versiona só os resumos pequenos e não sensíveis; modelos treinados (.joblib),
+# validação cruzada e predições por paciente ficam fora do Git.
+!models/*/
+models/*/*
+!models/*/*/
+models/*/*/*
+!models/*/*/metricas.json
+!models/*/*/importancia_permutacao.csv
+!models/*/*/razoes_de_chances.csv
+_arquivados/

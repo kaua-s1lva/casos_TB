@@ -1,8 +1,3 @@
-"""
-Caminhos e parâmetros do projeto, num lugar só.
-Todos os caminhos partem da raiz do projeto (a pasta ia/), então os scripts
-funcionam de qualquer pasta de onde forem executados.
-"""
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
@@ -23,3 +18,6 @@ MODELS = RAIZ / "models"
 
 # configuração do banco
 ARQ_ENV = RAIZ / ".env"
+
+# semente de todos os procedimentos aleatórios (reprodutibilidade)
+SEMENTE = 42

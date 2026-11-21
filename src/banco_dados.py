@@ -37,7 +37,7 @@ class ConexaoBanco:
                 
         return self.engine
 
-    def obter_dataframe(self, query):
+    def consultar(self, query):
         """Executa uma query SQL e retorna os dados em um DataFrame Pandas."""
         if self.engine is None:
             self.conectar()
@@ -51,7 +51,7 @@ class ConexaoBanco:
                 return None
         return None
 
-    def enviar_dataframe(self, df, nome_tabela, modo='replace'):
+    def gravar_tabela(self, df, nome_tabela, modo='replace'):
         """Envia um DataFrame Pandas para uma tabela no banco de dados."""
         if self.engine is None:
             self.conectar()

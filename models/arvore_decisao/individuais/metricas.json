@@ -1,0 +1,37 @@
+{
+  "modelo": "arvore_decisao",
+  "cenario": "Só individuais",
+  "data_execucao": "2026-11-21 14:54",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca"
+  ],
+  "hiperparametros": {
+    "criterion": "gini",
+    "max_depth": 10,
+    "min_samples_leaf": 200
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.6955897504313107,
+  "auc_validacao_cruzada_desvio": 0.006356354050997414,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.6962583404585294,
+    "Sensibilidade": 0.6570386135603526,
+    "Especificidade": 0.6329583013387641,
+    "Precisão": 0.28218856098197964,
+    "F1-Score": 0.3948113638439755,
+    "Acurácia": 0.6372943527415073
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

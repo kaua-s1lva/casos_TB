@@ -9,19 +9,19 @@ Colunas: Total (= Cura + Perda de seguimento), Cura e Perda de seguimento.
   - variáveis contínuas:   mediana [IQR]
 
 Saídas na pasta reports/:
-  - tabela1.csv   (abre no Excel, separador ;)
-  - tabela1.html  (abre no navegador; dá para copiar e colar no Word)
+  - tabela_caracteristicas_populacao.csv   (abre no Excel, separador ;)
+  - tabela_caracteristicas_populacao.html  (abre no navegador; dá para copiar e colar no Word)
 
-Uso (dentro da pasta ia):  python src/visualization/tabela1.py
+Uso (dentro da pasta ia):  python src/visualization/tabela_caracteristicas_populacao.py
 """
 import os
 import pandas as pd
-from src.db_manager import ConexaoBanco
+from src.banco_dados import ConexaoBanco
 from src.config import REPORTS
 
 PASTA_SAIDA = str(REPORTS)
 
-QUERY = """
+CONSULTA_POPULACAO_ESTUDO = """
     SELECT faixa_etaria, sexo, teste_hiv, alcool, tabagismo, drogas,
            escolaridade, raca, situacao_encerramento
     FROM casos_tuberculose.vw_populacao_estudo
@@ -54,7 +54,7 @@ CORRECOES = {
 IGNORADO = "Ignorado / não informado"
 
 
-def limpar(df, col, ordem):
+def padronizar_categoria(df, col, ordem):
     s = df[col].astype("string").str.strip()
     s = s.replace(CORRECOES.get(col, {}))
     # qualquer valor fora do domínio (códigos soltos como 3, 9, 0, 8, nulos) vira "Ignorado"
@@ -69,10 +69,10 @@ def _num(x, casas=1):
     return f"{x:.{casas}f}".replace(".", ",")
 
 
-def gerar_tabela1(db=None):
+def gerar_tabela_caracteristicas_populacao(db=None):
     db = db or ConexaoBanco()
     print("[*] Extraindo dados...")
-    df = db.obter_dataframe(QUERY)
+    df = db.consultar(CONSULTA_POPULACAO_ESTUDO)
     if df is None or df.empty:
         print("[X] Erro: Sem dados.")
         return
@@ -88,7 +88,7 @@ def gerar_tabela1(db=None):
 
     linhas = []
     for col, rotulo, ordem in CATEGORICAS:
-        s = limpar(df, col, ordem)
+        s = padronizar_categoria(df, col, ordem)
         cats = [c for c in ordem if (s == c).any()] + ([IGNORADO] if (s == IGNORADO).any() else [])
         linhas.append({"Característica": rotulo, **{cab[g]: "" for g in grupos}})
         for c in cats:
@@ -108,7 +108,7 @@ def gerar_tabela1(db=None):
 
     tab = pd.DataFrame(linhas)
     os.makedirs(PASTA_SAIDA, exist_ok=True)
-    tab.to_csv(os.path.join(PASTA_SAIDA, "tabela1.csv"), sep=";", index=False, encoding="utf-8-sig")
+    tab.to_csv(os.path.join(PASTA_SAIDA, "tabela_caracteristicas_populacao.csv"), sep=";", index=False, encoding="utf-8-sig")
 
     nota = ("Valores em n (%), com percentual dentro de cada coluna, salvo indicação. "
             "Perda de seguimento = Abandono + Abandono Primário. Total = Cura + Perda de "
@@ -132,7 +132,7 @@ def gerar_tabela1(db=None):
               "th:first-child,td:first-child{text-align:left}"
               "thead th{border-top:2px solid #000;border-bottom:1px solid #000}"
               "tbody tr:last-child td{border-bottom:2px solid #000}</style>")
-    with open(os.path.join(PASTA_SAIDA, "tabela1.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(PASTA_SAIDA, "tabela_caracteristicas_populacao.html"), "w", encoding="utf-8") as f:
         f.write(f"<html><head><meta charset='utf-8'>{estilo}</head><body>"
                 f"<h3>Tabela 1 — Características da população de estudo: casos novos de TB "
                 f"pulmonar notificados no SINAN, 2018–2022</h3>{html}<p style='max-width:900px'>{nota}</p></body></html>")
@@ -141,8 +141,8 @@ def gerar_tabela1(db=None):
     pd.set_option("display.max_rows", 500)
     pd.set_option("display.max_colwidth", 60)
     print(tab.to_string(index=False))
-    print(f"\n[+] Tabela salva em '{PASTA_SAIDA}/tabela1.csv' e 'tabela1.html'.")
+    print(f"\n[+] Tabela salva em '{PASTA_SAIDA}/tabela_caracteristicas_populacao.csv' e 'tabela_caracteristicas_populacao.html'.")
 
 
 if __name__ == "__main__":
-    gerar_tabela1()
+    gerar_tabela_caracteristicas_populacao()

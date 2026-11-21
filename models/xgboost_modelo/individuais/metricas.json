@@ -1,0 +1,37 @@
+{
+  "modelo": "xgboost_modelo",
+  "cenario": "Só individuais",
+  "data_execucao": "2026-11-21 15:31",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca"
+  ],
+  "hiperparametros": {
+    "learning_rate": 0.05,
+    "max_depth": 4,
+    "scale_pos_weight": 5.55783212161269
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.7025872858183156,
+  "auc_validacao_cruzada_desvio": 0.006253260953080362,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.7014429350687313,
+    "Sensibilidade": 0.6199452721191852,
+    "Especificidade": 0.6756251460621641,
+    "Precisão": 0.2956357836740612,
+    "F1-Score": 0.40035342627135284,
+    "Acurácia": 0.6655990802332266
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

@@ -1,5 +1,6 @@
 """
-Carga das tabelas no MySQL.
+Reconstrução da base de dados (ETL) — Seção 3.2 do TCC.
+Carrega as tabelas no MySQL a partir das fontes originais.
 
   fnotificacao  <- data/raw/fNotificacao.csv (sem linhas duplicadas e com as chaves de
                    local redirecionadas para a dlocal sem duplicados)
@@ -9,14 +10,14 @@ Carga das tabelas no MySQL.
                    + cobertura da APS/ESF (data/raw/PacientesTB mais dados muncipais casos maior que 4.xlsx)
                    uma linha por município (duplicados removidos)
 
-Uso (dentro da pasta ia):  python src/data/carga_mysql.py   ou   python main.py
+Uso (dentro da pasta ia):  python src/data/construir_base_dados.py   ou   python main.py
 """
 import html
 import re
 import zipfile
 import numpy as np
 import pandas as pd
-from src.db_manager import ConexaoBanco
+from src.banco_dados import ConexaoBanco
 from src.config import ARQ_FATO, ARQ_DLOCAL, ARQ_ATLAS, ARQ_PACIENTES
 
 ANO_ATLAS = 2010
@@ -25,7 +26,7 @@ ANO_ATLAS = 2010
 # ---------------------------------------------------------------------------
 # Fato
 # ---------------------------------------------------------------------------
-def carregar_fato(db, mapa_locais):
+def carregar_notificacoes(db, mapa_locais):
     df = pd.read_csv(ARQ_FATO, sep=";", encoding="utf-8")
 
     # 1) notificações duplicadas: mesma linha em todas as colunas, exceto o id
@@ -41,20 +42,20 @@ def carregar_fato(db, mapa_locais):
         print(f"    {col}: {(novos != df[col]).sum()} chaves redirecionadas")
         df[col] = novos.astype("int64")
 
-    db.enviar_dataframe(df, "fnotificacao")
+    db.gravar_tabela(df, "fnotificacao")
 
 
 # ---------------------------------------------------------------------------
 # dLocal
 # ---------------------------------------------------------------------------
-def ler_dlocal_original():
+def ler_dimensao_local_original():
     """Da dLocal original fica só o que não vem do Atlas: chaves, nomes, códigos,
     população, faixa populacional, UF e região."""
     colunas = ["id_local", "codigo_uf", "id_municipio", "municipio_uf", "id_municipio_nome",
                "populacao", "faixa_populacao", "sigla_uf", "cod_uf", "regiao",
                "Estado_Pais", "Estado_Pais_Completo"]
     d = pd.read_csv(ARQ_DLOCAL, sep=";", encoding="utf-8", usecols=colunas)
-    d = corrigir_codigos_6_digitos(d)
+    d = corrigir_codigos_ibge(d)
     # nome vazio (municípios ausentes do Atlas usado no ETL original): tira do municipio_uf,
     # ex.: "Balneário Rincão (SC)" -> "Balneário Rincão"
     sem_nome = d["id_municipio_nome"].isna()
@@ -66,7 +67,7 @@ def ler_dlocal_original():
     return d
 
 
-def corrigir_codigos_6_digitos(d):
+def corrigir_codigos_ibge(d):
     """O ETL original converteu os códigos IBGE de 6 para 7 dígitos usando a lista de
     municípios do Atlas 2010. Municípios instalados depois de 2010 (Balneário Rincão/SC
     e Mojuí dos Campos/PA) não estão no Atlas, então ficaram com o código de 6 dígitos
@@ -92,7 +93,7 @@ def corrigir_codigos_6_digitos(d):
     return d
 
 
-def remover_locais_duplicados(d):
+def remover_municipios_duplicados(d):
     """Mantém uma linha por município (id_municipio).
 
     O ETL original criou locais de notificação combinando a UF de notificação com o
@@ -117,7 +118,7 @@ def remover_locais_duplicados(d):
     return unicos, mapa
 
 
-def ler_atlas():
+def ler_indicadores_atlas():
     colunas = {
         "ANO": "ano", "Codmun7": "id_municipio",
         "ESPVIDA": "expectativa_vida",   # esperança de vida ao nascer (anos)
@@ -136,7 +137,7 @@ def ler_atlas():
     return a
 
 
-def _letra(i):
+def _letra_coluna_excel(i):
     s, n = "", i + 1
     while n:
         n, r = divmod(n - 1, 26)
@@ -170,13 +171,13 @@ ATLAS_MANUAL = {
 }
 
 
-def ler_cobertura():
+def ler_cobertura_aps():
     """Lê só as colunas codigo_ibge, pc_cobertura_aps_2021 e pc_cobertura_sf_2019.
     A planilha tem ~3 GB descompactada, então o XML é lido em blocos em vez de abrir
     a planilha inteira com o pandas (que levaria muito tempo e memória)."""
     alvo = ["codigo_ibge", "pc_cobertura_aps_2021", "pc_cobertura_sf_2019"]
     cab = pd.read_excel(ARQ_PACIENTES, nrows=0).columns.tolist()
-    letra_para_nome = {_letra(cab.index(c)): c for c in alvo}
+    letra_para_nome = {_letra_coluna_excel(cab.index(c)): c for c in alvo}
     padrao = re.compile(
         r'<c r="(' + "|".join(letra_para_nome) + r')(\d+)"[^>]*?'
         r'(?:/>|>(?:<v>([^<]*)</v>|<is><t[^>]*>([^<]*)</t></is>)?</c>)')
@@ -206,7 +207,7 @@ def ler_cobertura():
                              "pc_cobertura_sf_2019": "cobertura_esf_2019"})
 
 
-def faixa(serie, cortes, nomes):
+def classificar_em_faixas(serie, cortes, nomes):
     def f(x):
         if pd.isna(x):
             return "Ignorado"
@@ -217,14 +218,14 @@ def faixa(serie, cortes, nomes):
     return serie.map(f)
 
 
-def montar_dlocal():
+def montar_dimensao_local():
     print("[*] Lendo dLocal original...")
-    d = ler_dlocal_original()
-    d, mapa_locais = remover_locais_duplicados(d)
+    d = ler_dimensao_local_original()
+    d, mapa_locais = remover_municipios_duplicados(d)
     print(f"[*] Lendo Atlas Brasil ({ANO_ATLAS})...")
-    atlas = ler_atlas()
+    atlas = ler_indicadores_atlas()
     print("[*] Lendo cobertura da APS (leva cerca de 2 minutos)...")
-    cob = ler_cobertura()
+    cob = ler_cobertura_aps()
 
     d = d.merge(atlas, on="id_municipio", how="left")
     d = d.merge(cob, on="id_municipio", how="left")
@@ -243,15 +244,15 @@ def montar_dlocal():
             print(f"    Atlas preenchido com o município de origem: "
                   f"{', '.join(d.loc[linhas, 'municipio_uf'])}")
 
-    d["Faixa_IDHM"] = faixa(d["idhm"], [.5, .6, .7, .8, np.inf],
+    d["Faixa_IDHM"] = classificar_em_faixas(d["idhm"], [.5, .6, .7, .8, np.inf],
                             ["Muito baixo", "Baixo", "Médio", "Alto", "Muito alto"])
     pob = ["Baixa (<10%)", "Média (10–19%)", "Alta (20–39%)", "Muito alta (≥40%)"]
-    d["Faixa_Pobreza"] = faixa(d["prop_pobreza"], [10, 20, 40, np.inf], pob)
+    d["Faixa_Pobreza"] = classificar_em_faixas(d["prop_pobreza"], [10, 20, 40, np.inf], pob)
     d["Faixa_Pobreza_Ordem"] = d["Faixa_Pobreza"].map({n: i + 1 for i, n in enumerate(pob)}).fillna(5).astype(int)
     ren = ["Muito baixa", "Baixa", "Média", "Alta"]
-    d["Faixa_Renda_PC"] = faixa(d["renda_pc"], [100, 500, 1000, np.inf], ren)
+    d["Faixa_Renda_PC"] = classificar_em_faixas(d["renda_pc"], [100, 500, 1000, np.inf], ren)
     d["Faixa_Renda_PC_Ordem"] = d["Faixa_Renda_PC"].map({n: i + 1 for i, n in enumerate(ren)}).fillna(5).astype(int)
-    d["Faixa_Gini"] = faixa(d["indice_gini"], [.40, .50, np.inf],
+    d["Faixa_Gini"] = classificar_em_faixas(d["indice_gini"], [.40, .50, np.inf],
                             ["Baixa desigualdade", "Desigualdade média", "Alta desigualdade"])
 
     d = d[["id_local", "codigo_uf", "id_municipio", "municipio_uf", "id_municipio_nome",
@@ -266,13 +267,13 @@ def montar_dlocal():
     return d, mapa_locais
 
 
-def carregar_dados():
+def construir_base_dados():
     db = ConexaoBanco()
-    dlocal, mapa_locais = montar_dlocal()
+    dlocal, mapa_locais = montar_dimensao_local()
     print("[*] Carregando a fNotificacao...")
-    carregar_fato(db, mapa_locais)
-    db.enviar_dataframe(dlocal, "dlocal")
+    carregar_notificacoes(db, mapa_locais)
+    db.gravar_tabela(dlocal, "dlocal")
 
 
 if __name__ == "__main__":
-    carregar_dados()
+    construir_base_dados()

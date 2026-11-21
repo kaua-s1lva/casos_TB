@@ -1,0 +1,44 @@
+{
+  "modelo": "rede_neural",
+  "cenario": "Individuais + municipais",
+  "data_execucao": "2026-11-21 15:24",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca",
+    "faixa_populacao",
+    "regiao",
+    "idhm",
+    "indice_gini",
+    "cobertura_aps_2021"
+  ],
+  "hiperparametros": {
+    "alpha": 0.0001,
+    "hidden_layer_sizes": [
+      32
+    ],
+    "learning_rate_init": 0.001
+  },
+  "balanceamento": "subamostragem",
+  "auc_validacao_cruzada": 0.7162865446471186,
+  "auc_validacao_cruzada_desvio": 0.005572919714353626,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.7128280109701002,
+    "Sensibilidade": 0.6650957737914259,
+    "Especificidade": 0.6476813674757119,
+    "Precisão": 0.29307341907824225,
+    "F1-Score": 0.406863200967172,
+    "Acurácia": 0.6508171142317484
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

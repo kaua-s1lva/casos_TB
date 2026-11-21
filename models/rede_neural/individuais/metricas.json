@@ -1,0 +1,39 @@
+{
+  "modelo": "rede_neural",
+  "cenario": "Só individuais",
+  "data_execucao": "2026-11-21 15:24",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca"
+  ],
+  "hiperparametros": {
+    "alpha": 0.01,
+    "hidden_layer_sizes": [
+      32
+    ],
+    "learning_rate_init": 0.001
+  },
+  "balanceamento": "subamostragem",
+  "auc_validacao_cruzada": 0.7012678052888672,
+  "auc_validacao_cruzada_desvio": 0.005702951190439813,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.7007616762156121,
+    "Sensibilidade": 0.6389480085132259,
+    "Especificidade": 0.6533903114879979,
+    "Precisão": 0.2881727802536853,
+    "F1-Score": 0.39720266502858764,
+    "Acurácia": 0.6507897402206345
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

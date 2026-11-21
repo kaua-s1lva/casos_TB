@@ -17,12 +17,12 @@ Saídas:
   - tabela tb_abt_tuberculose no MySQL (substituída a cada execução)
   - data/processed/abt_tuberculose.csv (cópia congelada para reprodutibilidade)
 
-Uso (dentro da pasta ia):  python src/features/process_data.py   ou   python main.py
+Uso (dentro da pasta ia):  python src/features/construir_abt.py   ou   python main.py
 """
 from datetime import datetime
 
 import pandas as pd
-from src.db_manager import ConexaoBanco
+from src.banco_dados import ConexaoBanco
 from src.config import DATA_PROCESSED
 
 TABELA_ABT = "tb_abt_tuberculose"
@@ -31,7 +31,7 @@ IGNORADO = "Ignorado"
 
 # Mesmos critérios de seleção do fluxograma (sql/vw_populacao_estudo.sql).
 # Obs.: não usar '%' (LIKE) — o pymysql interpreta '%' como parâmetro.
-QUERY = """
+CONSULTA_POPULACAO_ESTUDO = """
     SELECT
         f.id_notificacao,
         t.ano_notificacao,
@@ -83,7 +83,7 @@ NUMERICAS = ["idhm", "indice_gini", "cobertura_aps_2021"]
 PERDA_SEGUIMENTO = ["Abandono", "Abandono Primário"]
 
 
-def limpar(df):
+def padronizar_variaveis(df):
     df = df.copy()
 
     for col, validas in CATEGORIAS.items():
@@ -101,17 +101,17 @@ def limpar(df):
     return df
 
 
-def preparar_dados_ml():
+def construir_abt():
     db = ConexaoBanco()
 
     print("[*] Extraindo a população de estudo do banco...")
-    df = db.obter_dataframe(QUERY)
+    df = db.consultar(CONSULTA_POPULACAO_ESTUDO)
     if df is None or df.empty:
         print("[X] Erro: consulta sem dados.")
         return None
 
     print("[*] Limpando e padronizando...")
-    abt = limpar(df)
+    abt = padronizar_variaveis(df)
 
     # resumo
     n, n_ab = len(abt), int(abt["alvo_preditivo"].sum())
@@ -122,7 +122,7 @@ def preparar_dados_ml():
     print(f"    Indicadores municipais faltantes: {nul[nul > 0].to_dict() or 'nenhum'}")
 
     # banco + cópia congelada
-    db.enviar_dataframe(abt, TABELA_ABT, modo="replace")
+    db.gravar_tabela(abt, TABELA_ABT, modo="replace")
     DATA_PROCESSED.mkdir(parents=True, exist_ok=True)
     abt.assign(data_extracao=datetime.now().strftime("%Y-%m-%d %H:%M")).to_csv(
         ARQ_ABT, sep=";", index=False, encoding="utf-8")
@@ -131,4 +131,4 @@ def preparar_dados_ml():
 
 
 if __name__ == "__main__":
-    preparar_dados_ml()
+    construir_abt()
