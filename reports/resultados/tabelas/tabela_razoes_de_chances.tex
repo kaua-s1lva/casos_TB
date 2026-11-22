@@ -1,0 +1,67 @@
+\begin{table}[H]
+    \centering
+    \caption{Razões de chances da Regressão Logística, sem e com as variáveis municipais.}
+    \label{tab-apend-razoes}
+    \footnotesize
+    \renewcommand{\arraystretch}{0.92}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{6.5cm} c c}
+        \hline
+        \textbf{Variável e categoria} & \textbf{Sem municipais} & \textbf{Com municipais} \\
+        \hline
+        \multicolumn{3}{l}{\textbf{Faixa etária}} \\
+        \hspace{3mm}19 a 29 anos & 3,01 & 2,96 \\
+        \hspace{3mm}30 a 39 anos & 2,41 & 2,42 \\
+        \hspace{3mm}Ignorado & 1,82 & 1,87 \\
+        \hspace{3mm}40 a 49 anos & 1,87 & 1,86 \\
+        \hspace{3mm}50 a 59 anos & 1,32 & 1,30 \\
+        \multicolumn{3}{l}{\textbf{Sexo}} \\
+        \hspace{3mm}Masculino & 1,38 & 1,40 \\
+        \hspace{3mm}Ignorado & 0,95 & 1,00 \\
+        \multicolumn{3}{l}{\textbf{Teste de HIV}} \\
+        \hspace{3mm}Não realizado & 2,01 & 1,97 \\
+        \hspace{3mm}Positivo & 1,94 & 1,85 \\
+        \hspace{3mm}Ignorado & 1,70 & 1,74 \\
+        \hspace{3mm}Em andamento & 1,77 & 1,70 \\
+        \multicolumn{3}{l}{\textbf{Uso de álcool}} \\
+        \hspace{3mm}Sim & 1,31 & 1,36 \\
+        \hspace{3mm}Ignorado & 1,01 & 1,00 \\
+        \multicolumn{3}{l}{\textbf{Tabagismo}} \\
+        \hspace{3mm}Sim & 1,38 & 1,35 \\
+        \hspace{3mm}Ignorado & 1,11 & 1,13 \\
+        \multicolumn{3}{l}{\textbf{Uso de outras drogas}} \\
+        \hspace{3mm}Sim & 2,10 & 2,02 \\
+        \hspace{3mm}Ignorado & 1,20 & 1,21 \\
+        \multicolumn{3}{l}{\textbf{Escolaridade}} \\
+        \hspace{3mm}Ignorado & 2,18 & 2,34 \\
+        \hspace{3mm}Analfabeto & 1,92 & 2,31 \\
+        \hspace{3mm}Até o fundamental & 2,05 & 2,21 \\
+        \hspace{3mm}Ensino médio & 1,48 & 1,51 \\
+        \multicolumn{3}{l}{\textbf{Raça/cor}} \\
+        \hspace{3mm}Preta & 1,37 & 1,38 \\
+        \hspace{3mm}Ignorado & 1,29 & 1,28 \\
+        \hspace{3mm}Parda & 1,15 & 1,21 \\
+        \hspace{3mm}Amarela/Indígena & 0,89 & 1,00 \\
+        \multicolumn{3}{l}{\textbf{Porte populacional}} \\
+        \hspace{3mm}Ignorado & --- & 1,00 \\
+        \hspace{3mm}50 mil a 100 mil & --- & 0,73 \\
+        \hspace{3mm}100 mil a 500 mil & --- & 0,73 \\
+        \hspace{3mm}20 mil a 50 mil & --- & 0,63 \\
+        \hspace{3mm}Até 5 mil & --- & 0,51 \\
+        \hspace{3mm}10 mil a 20 mil & --- & 0,50 \\
+        \hspace{3mm}5 mil a 10 mil & --- & 0,48 \\
+        \multicolumn{3}{l}{\textbf{Região}} \\
+        \hspace{3mm}Sul & --- & 1,32 \\
+        \hspace{3mm}Centro-Oeste & --- & 1,31 \\
+        \hspace{3mm}Norte & --- & 1,11 \\
+        \hspace{3mm}Nordeste & --- & 1,00 \\
+        \hspace{3mm}Ignorado & --- & 1,00 \\
+        \multicolumn{3}{l}{\textbf{IDHM}} \\
+        \hspace{3mm}por desvio-padrão & --- & 1,04 \\
+        \multicolumn{3}{l}{\textbf{Índice de Gini}} \\
+        \hspace{3mm}por desvio-padrão & --- & 0,97 \\
+        \multicolumn{3}{l}{\textbf{Cobertura da APS}} \\
+        \hspace{3mm}por desvio-padrão & --- & 0,92 \\
+        \hline
+    \end{tabular}
+    \legend{Nota: razões de chances em relação às categorias de referência da Tabela de variáveis preditoras; nas variáveis numéricas, por desvio-padrão. Valores iguais a 1,00 correspondem a coeficientes anulados pela regularização L1; --- indica variável não incluída no cenário.\\Fonte: elaborado pelo autor.}
+\end{table}

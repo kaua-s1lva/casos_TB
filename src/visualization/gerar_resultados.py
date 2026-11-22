@@ -27,7 +27,7 @@ from sklearn.metrics import roc_curve
 from src.config import MODELS
 from src.models.avaliacao_desempenho import LIMIAR, delong
 from src.visualization.estilo import (CATEGORIAS, CENARIOS, CINZA, CORES, MODELOS, TRACOS, VARIAVEIS,
-                                      num, salvar_figura, salvar_tabela)
+                                      PASTA_TABELAS, num, salvar_figura, salvar_tabela)
 from src.visualization.tabela_caracteristicas_populacao import gerar_tabela_caracteristicas_populacao
 
 COMPLETO = "individuais_municipais"
@@ -80,14 +80,15 @@ def tabela_desempenho(res):
         else:
             p = p_texto(delong(pred["y_real"], ref["probabilidade"], pred["probabilidade"])["p_valor"])
         linhas.append({"Modelo": MODELOS[modelo], "AUC (IC 95%)": ic_texto(delong(pred["y_real"], pred["probabilidade"])),
-                       f"p vs. {MODELOS[melhor]}": p, "Sensib.": num(t["Sensibilidade"]),
-                       "Especif.": num(t["Especificidade"]), "Precisão": num(t["Precisão"]),
+                       "p": p, "Sens.": num(t["Sensibilidade"]),
+                       "Espec.": num(t["Especificidade"]), "Prec.": num(t["Precisão"]),
                        "F1": num(t["F1-Score"]), "Brier": num(brier)})
     salvar_tabela(pd.DataFrame(linhas), "tabela_desempenho_modelos",
                   "Desempenho dos modelos no conjunto de teste (2022), com variáveis individuais e municipais.",
                   "tab-res-desempenho", "l c c c c c c c",
-                  nota=f"Nota: métricas calculadas com limiar de {num(LIMIAR, 1)}; IC 95% e p-valor pelo teste de DeLong; "
-                       "Brier = escore de Brier (quanto menor, melhor).")
+                  nota=f"Nota: métricas calculadas com limiar de {num(LIMIAR, 1)}. IC 95% da AUC pelo método de DeLong; "
+                       f"p = comparação da AUC com a do {MODELOS[melhor]} (teste de DeLong). Sens. = sensibilidade; "
+                       "Espec. = especificidade; Prec. = precisão; Brier = escore de Brier (quanto menor, melhor).")
 
 
 def tabela_comparacao_cenarios(res):
@@ -99,15 +100,16 @@ def tabela_comparacao_cenarios(res):
         assert (a["y_real"].to_numpy() == b["y_real"].to_numpy()).all(), "testes diferentes"
         d = delong(a["y_real"], a["probabilidade"], b["probabilidade"])
         linhas.append({"Modelo": MODELOS[modelo],
-                       "Só individuais": ic_texto(delong(b["y_real"], b["probabilidade"])),
-                       "Individuais + municipais": ic_texto(delong(a["y_real"], a["probabilidade"])),
+                       "Sem municipais": ic_texto(delong(b["y_real"], b["probabilidade"])),
+                       "Com municipais": ic_texto(delong(a["y_real"], a["probabilidade"])),
                        "Diferença (IC 95%)": f"{num(d['diferenca'])} ({num(d['dif_ic_inf'])}–{num(d['dif_ic_sup'])})",
-                       "p-valor": p_texto(d["p_valor"])})
+                       "p": p_texto(d["p_valor"])})
     salvar_tabela(pd.DataFrame(linhas), "tabela_comparacao_cenarios",
                   "AUC no conjunto de teste sem e com as variáveis do município de residência.",
                   "tab-res-cenarios", "l c c c c",
-                  nota="Nota: AUC (IC 95%); diferença = com municipais menos só individuais; "
-                       "IC e p-valor pelo teste de DeLong para curvas ROC pareadas.")
+                  nota="Nota: AUC (IC 95%). Sem municipais = apenas variáveis individuais; com municipais = "
+                       "variáveis individuais e do município de residência; diferença = com municipais menos sem "
+                       "municipais. IC e p pelo teste de DeLong para curvas ROC pareadas.")
 
 
 def _formatar_hiperparametros(h):
@@ -129,18 +131,38 @@ def _formatar_hiperparametros(h):
     return "; ".join(partes)
 
 
+def _texto_balanceamento(res):
+    """Resume o balanceamento escolhido (a MLP só tem subamostragem, então fica de fora)."""
+    escolhas = {}
+    for (modelo, cenario), r in res.items():
+        if modelo != "rede_neural":
+            escolhas.setdefault(r["metricas"]["balanceamento"], []).append(f"{MODELOS[modelo]} ({CENARIOS[cenario].lower()})")
+    if len(escolhas) == 1:
+        estrategia = "ponderação por classe" if "pesos por classe" in escolhas else "subamostragem"
+        return (f"A {estrategia} foi selecionada em todos os modelos em que foi comparada com a outra estratégia; "
+                "a MLP utilizou apenas a subamostragem.")
+    return "Balanceamento selecionado: " + "; ".join(f"{b}: {', '.join(m)}" for b, m in escolhas.items()) + \
+           "; a MLP utilizou apenas a subamostragem."
+
+
 def tabela_hiperparametros(res):
     linhas = []
+    anterior = None
     for (modelo, cenario), r in res.items():
         m = r["metricas"]
-        linhas.append({"Modelo": MODELOS[modelo], "Cenário": CENARIOS[cenario],
+        # o nome do modelo aparece só na primeira linha de cada par de cenários
+        linhas.append({"Modelo": MODELOS[modelo] if modelo != anterior else "",
+                       "Cenário": {"individuais": "Sem municipais", COMPLETO: "Com municipais"}[cenario],
                        "Hiperparâmetros escolhidos": _formatar_hiperparametros(m["hiperparametros"]),
-                       "Balanceamento": m["balanceamento"],
-                       "AUC na validação cruzada": f"{num(m['auc_validacao_cruzada'])} ± {num(m['auc_validacao_cruzada_desvio'])}"})
+                       "AUC (validação cruzada)": f"{num(m['auc_validacao_cruzada'])} ± {num(m['auc_validacao_cruzada_desvio'])}"})
+        anterior = modelo
     salvar_tabela(pd.DataFrame(linhas), "tabela_hiperparametros",
                   "Hiperparâmetros selecionados pela validação cruzada em cada modelo e cenário.",
-                  "tab-res-hiperparametros", "p{2.4cm} p{2.4cm} p{4.6cm} p{2.0cm} c",
-                  nota="Nota: AUC na validação cruzada = média ± desvio-padrão nas 10 partes do conjunto de treinamento.")
+                  "tab-res-hiperparametros", " ".join(f">{{\\raggedright\\arraybackslash}}p{{{w}}}"
+                                                       for w in ["3.0cm", "2.5cm", "6.6cm", "2.6cm"]),
+                  nota="Nota: sem municipais = apenas variáveis individuais; com municipais = variáveis individuais "
+                       "e do município de residência. AUC na validação cruzada = média ± desvio-padrão nas 10 partes "
+                       "do conjunto de treinamento. " + _texto_balanceamento(res))
 
 
 # ------------------------------------------------------------------ figuras
@@ -192,6 +214,44 @@ def _rotulo_dummy(nome):
             cat = nome[len(var) + 1:]
             return VARIAVEIS[var], CATEGORIAS.get(cat, cat)
     return VARIAVEIS.get(nome, nome), None
+
+
+def tabela_razoes_de_chances(res):
+    """Apêndice: razões de chances da Regressão Logística nos dois cenários (valores da Figura)."""
+    oddsr = {}
+    for cenario in CENARIOS:
+        arq = MODELS / "regressao_logistica" / cenario / "razoes_de_chances.csv"
+        if arq.exists():
+            oddsr[cenario] = pd.read_csv(arq, sep=";").set_index("variavel")["OR"]
+    if COMPLETO not in oddsr:
+        return
+    linhas, tex = [], []
+    for var in VARIAVEIS:   # ordem da Tabela 3
+        nomes = [n for n in oddsr[COMPLETO].index if _rotulo_dummy(n)[0] == VARIAVEIS[var]]
+        if not nomes:
+            continue
+        tex.append(rf"        \multicolumn{{3}}{{l}}{{\textbf{{{VARIAVEIS[var]}}}}} \\")
+        for n in nomes:
+            cat = _rotulo_dummy(n)[1] or "por desvio-padrão"
+            valores = [num(oddsr[c][n], 2) if c in oddsr and n in oddsr[c].index else "---" for c in CENARIOS]
+            linhas.append({"Variável": VARIAVEIS[var], "Categoria": cat,
+                           **{CENARIOS[c]: v for c, v in zip(CENARIOS, valores)}})
+            tex.append(rf"        \hspace{{3mm}}{cat} & {valores[0]} & {valores[1]} \\")
+    PASTA_TABELAS.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(linhas).to_csv(PASTA_TABELAS / "tabela_razoes_de_chances.csv", sep=";", index=False,
+                                encoding="utf-8-sig")
+    nota = ("Nota: razões de chances em relação às categorias de referência da Tabela de variáveis "
+            "preditoras; nas variáveis numéricas, por desvio-padrão. Valores iguais a 1,00 correspondem a "
+            "coeficientes anulados pela regularização L1; --- indica variável não incluída no cenário.")
+    (PASTA_TABELAS / "tabela_razoes_de_chances.tex").write_text("\n".join([
+        r"\begin{table}[H]", r"    \centering",
+        r"    \caption{Razões de chances da Regressão Logística, sem e com as variáveis municipais.}",
+        r"    \label{tab-apend-razoes}", r"    \footnotesize", r"    \renewcommand{\arraystretch}{0.92}",
+        r"    \begin{tabular}{>{\raggedright\arraybackslash}p{6.5cm} c c}", r"        \hline",
+        r"        \textbf{Variável e categoria} & \textbf{Sem municipais} & \textbf{Com municipais} \\",
+        r"        \hline", *tex, r"        \hline", r"    \end{tabular}",
+        rf"    \legend{{{nota}\\Fonte: elaborado pelo autor.}}", r"\end{table}", ""]), encoding="utf-8")
+    print(f"[+] Tabela: {PASTA_TABELAS / 'tabela_razoes_de_chances'}.tex")
 
 
 def figura_razoes_de_chances(res):
@@ -304,6 +364,7 @@ def gerar_resultados(incluir_tabela_populacao=True):
     tabela_desempenho(res)
     tabela_comparacao_cenarios(res)
     tabela_hiperparametros(res)
+    tabela_razoes_de_chances(res)
     figura_curvas_roc(res)
     figura_comparacao_cenarios(res)
     figura_razoes_de_chances(res)

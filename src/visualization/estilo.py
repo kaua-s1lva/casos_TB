@@ -82,7 +82,8 @@ def salvar_tabela(df, nome, legenda, rotulo, colunas_formato, nota=None, fonte="
     rodape = (f"{_escapar(nota)}\\\\" if nota else "") + fonte
     tex = "\n".join([
         "\\begin{table}[H]", "    \\centering", f"    \\caption{{{legenda}}}", f"    \\label{{{rotulo}}}",
-        "    \\footnotesize", f"    \\begin{{tabular}}{{{colunas_formato}}}", "        \\hline",
+        "    \\footnotesize", "    \\renewcommand{\\arraystretch}{1.2}", "    \\setlength{\\tabcolsep}{4pt}",
+        f"    \\begin{{tabular}}{{{colunas_formato}}}", "        \\hline",
         "        " + " & ".join(f"\\textbf{{{_escapar(c)}}}" for c in df.columns) + " \\\\",
         "        \\hline", *["        " + l for l in linhas], "        \\hline", "    \\end{tabular}",
         f"    \\legend{{{rodape}}}", "\\end{table}", ""])
