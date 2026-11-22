@@ -11,7 +11,10 @@ que dependem apenas da própria linha:
 
 Ficam FORA da ABT, dentro do Pipeline de treino (ajustados só com o conjunto
 de treino, para não vazar informação do teste):
-  one-hot encoding, normalização, imputação de faltantes e balanceamento.
+  one-hot encoding, padronização e balanceamento.
+
+Os indicadores municipais não podem ter valores faltantes (o ETL preenche os que
+faltavam): se algum aparecer, a construção da ABT é interrompida.
 
 Saídas:
   - tabela tb_abt_tuberculose no MySQL (substituída a cada execução)
@@ -91,7 +94,7 @@ def padronizar_variaveis(df):
         df[col] = s.where(s.isin(validas), IGNORADO).fillna(IGNORADO)
 
     # indicadores municipais como número (aceita vírgula decimal, caso a dlocal
-    # tenha sido carregada como texto); faltantes ficam NaN para o pipeline imputar
+    # tenha sido carregada como texto); valores inválidos viram NaN e são barrados em construir_abt
     for col in NUMERICAS:
         df[col] = pd.to_numeric(df[col].astype("string").str.replace(",", ".", regex=False),
                                 errors="coerce")
@@ -119,7 +122,10 @@ def construir_abt():
     ign = {c: int((abt[c] == IGNORADO).sum()) for c in CATEGORIAS if (abt[c] == IGNORADO).any()}
     print(f"    'Ignorado' por variável: {ign}")
     nul = abt[NUMERICAS].isna().sum()
-    print(f"    Indicadores municipais faltantes: {nul[nul > 0].to_dict() or 'nenhum'}")
+    if nul.any():
+        raise ValueError(f"Indicadores municipais faltantes na ABT: {nul[nul > 0].to_dict()}. "
+                         "Corrija a dlocal no ETL (src/data/construir_base_dados.py) antes de treinar.")
+    print("    Indicadores municipais faltantes: nenhum")
 
     # banco + cópia congelada
     db.gravar_tabela(abt, TABELA_ABT, modo="replace")

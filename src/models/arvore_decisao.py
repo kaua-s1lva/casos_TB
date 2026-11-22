@@ -4,7 +4,7 @@
 Segue o protocolo do Capítulo 3 (Metodologia) do TCC:
   1. treino = notificações de 2018 a 2021 | teste = notificações de 2022;
   2. categóricas: one-hot com "Ignorado" como categoria (a árvore não precisa remover
-     a categoria de referência); numéricas: mediana nos faltantes, sem padronização
+     a categoria de referência); numéricas: usadas como estão, sem padronização
      (a árvore não é sensível à escala) — tudo ajustado só no treino;
   3. busca em grade com validação cruzada estratificada (10 partes), critério AUC:
      critério de divisão, profundidade máxima, mínimo de exemplos por folha e
@@ -20,7 +20,6 @@ import pandas as pd
 from imblearn.pipeline import Pipeline
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier
@@ -46,7 +45,7 @@ def montar_pipeline(categoricas, numericas):
     preparo = ColumnTransformer([
         ("cat", OneHotEncoder(categories=[validas + ["Ignorado"] for validas, _ in categoricas.values()],
                               handle_unknown="ignore"), list(categoricas)),
-        ("num", SimpleImputer(strategy="median"), numericas),
+        ("num", "passthrough", numericas),
     ])
     modelo = DecisionTreeClassifier(class_weight="balanced", random_state=SEMENTE)
     return Pipeline([("preparo", preparo), ("balanceamento", "passthrough"), ("modelo", modelo)])

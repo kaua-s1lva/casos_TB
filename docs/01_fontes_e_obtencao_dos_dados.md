@@ -6,7 +6,7 @@
 |---|---|---|
 | SINAN – tuberculose (via Santos, 2026) | notificações de 2018 a 2022: características individuais, clínicas e situação de encerramento | Santos (2026) |
 | Atlas do Desenvolvimento Humano no Brasil | IDHM, índice de Gini, renda per capita, pobreza e esperança de vida, Censo 2010 | PNUD, Ipea e FJP (2013) |
-| Cobertura da Atenção Primária à Saúde | percentual de cobertura da APS por município, competência 07/2021 | Ministério da Saúde (e-Gestor) |
+| Cobertura da Atenção Primária à Saúde | percentual de cobertura da APS por município, competência 07/2021 | Ministério da Saúde (e-Gestor), já presente na planilha de notificações (`pc_cobertura_aps_2021`) |
 
 ## Por que os dados vêm de um arquivo `.pbix`
 
@@ -29,7 +29,7 @@ O ETL lê `fNotificacao.csv` e `dLocal.csv` com separador `;`. Em `dTempo.csv` o
 | Arquivo em `data/raw/` | Uso |
 |---|---|
 | `censo_total_1991_2010.xlsx` | aba `MUN 91-00-10` do Atlas; o ETL filtra o ano de 2010 |
-| `PacientesTB mais dados muncipais casos maior que 4.xlsx` | planilha do SINAN-TB com indicadores municipais; o ETL lê apenas `codigo_ibge`, `pc_cobertura_aps_2021` e `pc_cobertura_sf_2019` |
+| `PacientesTB mais dados muncipais casos maior que 4.xlsx` | planilha original do SINAN-TB (uma linha por notificação, 302.326 linhas e 234 colunas), com indicadores municipais já associados a cada caso. Foi a base do *Data Warehouse* de Santos (2026). Como as notificações vêm do `.pbix`, o ETL lê dela apenas `codigo_ibge`, `pc_cobertura_aps_2021` e `pc_cobertura_sf_2019`, ou seja, ela é a fonte da **cobertura da APS** |
 
 ## Ética e privacidade
 

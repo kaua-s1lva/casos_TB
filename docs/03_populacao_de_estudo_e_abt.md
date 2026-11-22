@@ -30,10 +30,10 @@ O número de casos excluídos em cada etapa fica em `reports/fluxograma_populaca
 Uma linha por notificação: **185.361 casos**. A ABT guarda dados **limpos, mas não transformados**. Nela entram só transformações que dependem apenas da própria linha:
 
 - **Padronização dos rótulos:** qualquer valor fora das categorias válidas vira `"Ignorado"`, inclusive nulos, códigos soltos como "9" e rótulos corrompidos. As categorias válidas estão em `CATEGORIAS`.
-- **Indicadores municipais como número:** valores faltantes ficam `NaN`.
+- **Indicadores municipais como número:** não pode haver valores faltantes (o ETL preenche os que faltavam). Se aparecer algum, a construção da ABT é interrompida com uma mensagem de erro.
 - **Criação do alvo binário.**
 
-Tudo o que precisa "aprender" com os dados fica **fora** da ABT, dentro do *pipeline* de cada modelo, e é ajustado só no treino: *one-hot*, imputação, padronização e balanceamento.
+Tudo o que precisa "aprender" com os dados fica **fora** da ABT, dentro do *pipeline* de cada modelo, e é ajustado só no treino: *one-hot*, padronização e balanceamento.
 
 **Saídas:**
 - tabela `tb_abt_tuberculose` no MySQL (substituída a cada execução);

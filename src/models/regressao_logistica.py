@@ -4,7 +4,7 @@ Regressão logística para prever a perda de seguimento do tratamento da tubercu
 Segue o protocolo do Capítulo 3 (Metodologia) do TCC:
   1. treino = notificações de 2018 a 2021 | teste = notificações de 2022;
   2. categóricas: one-hot com "Ignorado" como categoria e a categoria de referência removida;
-     numéricas: mediana (faltantes) + padronização — tudo ajustado só no treino;
+     numéricas: padronização — tudo ajustado só no treino;
   3. busca em grade com validação cruzada estratificada (10 partes), critério AUC:
      regularização L1/L2, intensidade C e balanceamento (pesos por classe x subamostragem);
   4. avaliação única no teste, com limiar de 0,5;
@@ -19,10 +19,8 @@ import pandas as pd
 from imblearn.pipeline import Pipeline
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.config import SEMENTE
@@ -46,7 +44,7 @@ def montar_pipeline(categoricas, numericas):
         ("cat", OneHotEncoder(categories=[validas + ["Ignorado"] for validas, _ in categoricas.values()],
                               drop=[referencia for _, referencia in categoricas.values()],
                               handle_unknown="ignore"), list(categoricas)),
-        ("num", make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), numericas),
+        ("num", StandardScaler(), numericas),
     ])
     modelo = LogisticRegression(solver="liblinear", class_weight="balanced",
                                 max_iter=2000, random_state=SEMENTE)

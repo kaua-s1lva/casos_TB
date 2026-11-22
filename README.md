@@ -36,7 +36,7 @@ Os dados **não estão no repositório**, por serem microdados de saúde. São n
 | `dLocal.csv` | dimensão de municípios | exportado do `.pbix` de Santos (2026) |
 | `dTempo.csv` | dimensão de datas (`id_tempo`, `ano_notificacao`) | exportado do `.pbix` de Santos (2026) |
 | `censo_total_1991_2010.xlsx` | indicadores municipais | Atlas do Desenvolvimento Humano no Brasil |
-| `PacientesTB mais dados muncipais casos maior que 4.xlsx` | cobertura da APS por município | Ministério da Saúde |
+| `PacientesTB mais dados muncipais casos maior que 4.xlsx` | planilha original das notificações do SINAN com indicadores municipais; o ETL usa dela só a cobertura da APS | base do *Data Warehouse* de Santos (2026) |
 
 O procedimento de obtenção está em [`docs/01_fontes_e_obtencao_dos_dados.md`](docs/01_fontes_e_obtencao_dos_dados.md).
 

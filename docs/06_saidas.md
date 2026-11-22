@@ -33,16 +33,16 @@ Cada tabela sai em `.csv` e em `.tex`. O `.tex` traz o ambiente `table` completo
 
 ## Usar no TCC
 
-Copie os arquivos para a pasta do LaTeX e inclua:
+Copie os arquivos para a pasta do LaTeX e inclua. Pelo guia da UFES, o título (`\caption`) fica **acima** da figura e a fonte (`\legend`) **abaixo**:
 
 ```latex
 \input{tabelas/tabela_desempenho_modelos.tex}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figuras/fig_curvas_roc.pdf}
     \caption{Curvas ROC dos modelos no conjunto de teste.}
     \label{fig-res-roc}
+    \includegraphics[width=0.7\textwidth]{figuras/fig_curvas_roc.pdf}
     \legend{Fonte: elaborado pelo autor.}
 \end{figure}
 ```

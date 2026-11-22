@@ -3,8 +3,8 @@ Perceptron Multicamadas (MLP) para prever a perda de seguimento do tratamento da
 
 Segue o protocolo do Capítulo 3 (Metodologia) do TCC:
   1. treino = notificações de 2018 a 2021 | teste = notificações de 2022;
-  2. categóricas: one-hot com "Ignorado" como categoria; numéricas: mediana nos
-     faltantes + padronização (a rede é sensível à escala) — ajustado só no treino;
+  2. categóricas: one-hot com "Ignorado" como categoria; numéricas: padronização
+     (a rede é sensível à escala) — ajustado só no treino;
   3. balanceamento por subamostragem: o MLPClassifier do scikit-learn não aceita
      pesos por classe (class_weight), então essa é a única opção para a rede;
   4. busca em grade com validação cruzada estratificada (10 partes), critério AUC:
@@ -21,10 +21,8 @@ import pandas as pd
 from imblearn.pipeline import Pipeline
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.neural_network import MLPClassifier
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.config import SEMENTE
@@ -45,7 +43,7 @@ def montar_pipeline(categoricas, numericas):
     preparo = ColumnTransformer([
         ("cat", OneHotEncoder(categories=[validas + ["Ignorado"] for validas, _ in categoricas.values()],
                               handle_unknown="ignore"), list(categoricas)),
-        ("num", make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), numericas),
+        ("num", StandardScaler(), numericas),
     ])
     modelo = MLPClassifier(activation="relu", solver="adam", max_iter=200,
                            early_stopping=True, validation_fraction=0.1, n_iter_no_change=10,

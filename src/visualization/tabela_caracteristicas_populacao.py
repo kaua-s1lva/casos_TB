@@ -12,6 +12,8 @@ exatamente os casos e as categorias (inclusive "Ignorado") dos modelos.
     e Mann-Whitney (numéricas), comparando cura x perda de seguimento
 
 Saídas em reports/resultados/tabelas/: tabela_caracteristicas_populacao.csv e .tex
+(o .tex é uma longtable em fonte reduzida, com variáveis em negrito e categorias recuadas,
+que continua na página seguinte com "(continua)" e "(conclusão)", como pede o guia da UFES)
 
 Uso (dentro da pasta ia):  python src/visualization/tabela_caracteristicas_populacao.py
 """
@@ -21,7 +23,7 @@ from scipy.stats import chi2_contingency, mannwhitneyu
 from src.banco_dados import ConexaoBanco
 from src.features.construir_abt import TABELA_ABT
 from src.features.variaveis import ALVO, CATEGORICAS, NUMERICAS
-from src.visualization.estilo import CATEGORIAS, VARIAVEIS, milhar, num, salvar_tabela
+from src.visualization.estilo import CATEGORIAS, PASTA_TABELAS, VARIAVEIS, _escapar, milhar, num
 
 
 def formatar_p(p):
@@ -69,16 +71,73 @@ def gerar_tabela_caracteristicas_populacao(abt=None):
         linhas.append(linha)
 
     tabela = pd.DataFrame(linhas)
-    salvar_tabela(tabela, "tabela_caracteristicas_populacao",
-                  "Características da população de estudo, segundo o desfecho do tratamento.",
-                  "tab-res-caracteristicas", "p{4.4cm} r r r c",
-                  nota="Nota: n (%), com percentual dentro de cada coluna; IIQ = intervalo interquartil. "
-                       "Nas variáveis do tipo sim/não, apresenta-se apenas a categoria ``Sim''. "
-                       "p-valor: teste qui-quadrado de independência (variáveis categóricas, incluindo "
-                       "a categoria ``Ignorado'') e teste de Mann-Whitney (variáveis numéricas), "
-                       "comparando cura e perda de seguimento. "
-                       "Perda de seguimento = abandono + abandono primário.")
+    salvar(tabela, {g: len(d) for g, d in grupos.items()})
     return tabela
+
+
+NOME = "tabela_caracteristicas_populacao"
+NOTA = ("Nota: variáveis categóricas em n (%), com percentual dentro de cada coluna; "
+        "IDHM, índice de Gini e cobertura da APS (%) em mediana [intervalo interquartil]. "
+        "Nas variáveis do tipo sim/não, apresenta-se apenas a categoria ``Sim''. "
+        "p-valor: teste qui-quadrado de independência (variáveis categóricas, incluindo a categoria "
+        "``Ignorado'') e teste de Mann-Whitney (variáveis numéricas), comparando cura e perda de "
+        "seguimento. Perda de seguimento = abandono + abandono primário.")
+
+
+def salvar(tabela, n_por_grupo):
+    """CSV com a tabela como está e LaTeX pronto para \\input no TCC."""
+    PASTA_TABELAS.mkdir(parents=True, exist_ok=True)
+    tabela.to_csv(PASTA_TABELAS / f"{NOME}.csv", sep=";", index=False, encoding="utf-8-sig")
+
+    corpo = []
+    for linha in tabela.itertuples(index=False):
+        rotulo, *valores, p = linha
+        p = p.replace("<", "$<$")
+        if rotulo.startswith("   "):                       # categoria: recuada
+            rotulo = "\\hspace{3mm}" + _escapar(rotulo.strip())
+        else:                                              # variável: em negrito
+            rotulo = rotulo.replace(", mediana [IIQ]", "")  # já explicado na nota
+            rotulo = f"\\textbf{{{_escapar(rotulo)}}}"
+        corpo.append("        " + " & ".join([rotulo, *map(_escapar, valores), p]) + " \\\\")
+
+    # longtable: a tabela ocupa duas páginas. Seguindo o guia da UFES, o título e o
+    # cabeçalho se repetem, com "(continua)" na primeira página e "(conclusão)" na
+    # última, e a linha de fechamento, a nota e a fonte aparecem só no fim.
+    legenda = "Características da população de estudo, segundo o desfecho do tratamento."
+    cabecalho = [
+        "        \\hline",
+        "        \\textbf{Característica} & " + " & ".join(f"\\textbf{{{g}}}" for g in n_por_grupo)
+        + " & \\textbf{p-valor} \\\\",
+        "         & " + " & ".join(f"(n = {milhar(n)})" for n in n_por_grupo.values()) + " & \\\\",
+        "        \\hline",
+    ]
+    # \Needspace*: se sobrar menos de meia página, a tabela começa na próxima. Assim ela
+    # ocupa sempre exatamente duas páginas e "(conclusão)" fica na última.
+    tex = "\n".join([
+        "\\Needspace*{0.5\\textheight}",
+        "\\begingroup",
+        "\\captionsetup{font=normalsize}",
+        "\\SingleSpacing*\\footnotesize",   # com *: sem a linha em branco que o memoir insere
+        "\\setlength{\\tabcolsep}{4pt}\\setlength{\\LTleft}{0pt}\\setlength{\\LTright}{0pt}",
+        "\\begin{longtable}{@{}l@{\\extracolsep{\\fill}}rrrc@{}}",
+        f"    \\caption{{{legenda}}}\\label{{tab-res-caracteristicas}} \\\\",
+        "        \\multicolumn{5}{r@{}}{(continua)} \\\\",
+        *cabecalho,
+        "    \\endfirsthead",
+        f"    \\caption[]{{{legenda}}} \\\\",
+        "        \\multicolumn{5}{r@{}}{(conclusão)} \\\\",
+        *cabecalho,
+        "    \\endhead",
+        "    \\endfoot",
+        "        \\hline",
+        f"        \\multicolumn{{5}}{{@{{}}p{{\\linewidth}}@{{}}}}{{{_escapar(NOTA)}}} \\\\",
+        "        \\multicolumn{5}{@{}l}{Fonte: elaborado pelo autor.} \\\\",
+        "    \\endlastfoot",
+        *corpo,
+        "\\end{longtable}",
+        "\\endgroup", ""])
+    (PASTA_TABELAS / f"{NOME}.tex").write_text(tex, encoding="utf-8")
+    print(f"[+] Tabela: {PASTA_TABELAS / NOME}.tex")
 
 
 if __name__ == "__main__":

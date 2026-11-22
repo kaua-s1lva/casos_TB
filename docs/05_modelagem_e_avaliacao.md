@@ -17,7 +17,7 @@ Funções compartilhadas: `avaliacao_desempenho.py` (métricas, importância por
 Cada modelo é um `imblearn.pipeline.Pipeline`. O preparo é ajustado **só no treino**, e dentro de cada parte da validação cruzada, para não vazar informação.
 
 1. **Categóricas:** *one-hot* com "Ignorado" como categoria. Na Regressão Logística, a categoria de referência é removida.
-2. **Numéricas:** imputação pela mediana. Na Regressão Logística e na MLP também há padronização (`StandardScaler`); os modelos de árvore não precisam dela.
+2. **Numéricas:** na Regressão Logística e na MLP, padronização (`StandardScaler`); nos modelos de árvore, usadas como estão. Não há imputação, porque a ABT não tem valores faltantes (verificado em `construir_abt.py`).
 3. **Balanceamento:** a busca em grade compara duas estratégias.
    - **Pesos por classe:** `class_weight="balanced"`.
    - **Subamostragem aleatória** da classe majoritária (`RandomUnderSampler`).

@@ -4,8 +4,8 @@ seguimento do tratamento da tuberculose. É o algoritmo de boosting usado por Ro
 
 Segue o protocolo do Capítulo 3 (Metodologia) do TCC:
   1. treino = notificações de 2018 a 2021 | teste = notificações de 2022;
-  2. categóricas: one-hot com "Ignorado" como categoria; numéricas: mediana nos
-     faltantes, sem padronização (árvores não são sensíveis à escala) — ajustado só no treino;
+  2. categóricas: one-hot com "Ignorado" como categoria; numéricas: usadas como
+     estão, sem padronização (árvores não são sensíveis à escala) — ajustado só no treino;
   3. busca em grade com validação cruzada estratificada (10 partes), critério AUC:
      taxa de aprendizado, número máximo de folhas por árvore e balanceamento
      (pesos por classe x subamostragem). Número de árvores fixo (300);
@@ -21,7 +21,6 @@ from imblearn.pipeline import Pipeline
 from imblearn.under_sampling import RandomUnderSampler
 from lightgbm import LGBMClassifier
 from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder
 
@@ -51,7 +50,7 @@ def montar_pipeline(categoricas, numericas):
     preparo = ColumnTransformer([
         ("cat", OneHotEncoder(categories=[validas + ["Ignorado"] for validas, _ in categoricas.values()],
                               handle_unknown="ignore"), list(categoricas)),
-        ("num", SimpleImputer(strategy="median"), numericas),
+        ("num", "passthrough", numericas),
     ])
     modelo = LGBMClassifier(n_estimators=300, n_jobs=1, random_state=SEMENTE, verbose=-1)
     return Pipeline([("preparo", preparo), ("balanceamento", "passthrough"), ("modelo", modelo)])
