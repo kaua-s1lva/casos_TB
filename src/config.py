@@ -9,6 +9,7 @@ DATA_PROCESSED = RAIZ / "data" / "processed"
 
 ARQ_FATO = DATA_RAW / "fNotificacao.csv"
 ARQ_DLOCAL = DATA_RAW / "dLocal.csv"
+ARQ_DTEMPO = DATA_RAW / "dTempo.csv"
 ARQ_ATLAS = DATA_RAW / "censo_total_1991_2010.xlsx"
 ARQ_PACIENTES = DATA_RAW / "PacientesTB mais dados muncipais casos maior que 4.xlsx"
 

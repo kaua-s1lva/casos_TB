@@ -1,0 +1,19 @@
+\begin{table}[H]
+    \centering
+    \caption{Desempenho dos modelos no conjunto de teste (2022), com variáveis individuais e municipais.}
+    \label{tab-res-desempenho}
+    \footnotesize
+    \begin{tabular}{l c c c c c c c}
+        \hline
+        \textbf{Modelo} & \textbf{AUC (IC 95\%)} & \textbf{p vs. XGBoost} & \textbf{Sensib.} & \textbf{Especif.} & \textbf{Precisão} & \textbf{F1} & \textbf{Brier} \\
+        \hline
+        Regressão Logística & 0,707 (0,700–0,713) & < 0,001 & 0,623 & 0,683 & 0,301 & 0,406 & 0,214 \\
+        Árvore de Decisão & 0,701 (0,694–0,707) & < 0,001 & 0,615 & 0,678 & 0,295 & 0,399 & 0,216 \\
+        Random Forest & 0,716 (0,709–0,723) & < 0,001 & 0,637 & 0,676 & 0,302 & 0,409 & 0,210 \\
+        MLP & 0,713 (0,706–0,720) & < 0,001 & 0,665 & 0,648 & 0,293 & 0,407 & 0,219 \\
+        XGBoost & 0,724 (0,718–0,731) & -- & 0,640 & 0,685 & 0,308 & 0,416 & 0,206 \\
+        LightGBM & 0,724 (0,718–0,731) & 0,910 & 0,640 & 0,688 & 0,311 & 0,418 & 0,202 \\
+        \hline
+    \end{tabular}
+    \legend{Nota: métricas calculadas com limiar de 0,5; IC 95\% e p-valor pelo teste de DeLong; Brier = escore de Brier (quanto menor, melhor).\\Fonte: elaborado pelo autor.}
+\end{table}

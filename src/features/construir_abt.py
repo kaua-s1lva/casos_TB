@@ -43,9 +43,9 @@ CONSULTA_POPULACAO_ESTUDO = """
         l.idhm, l.indice_gini, l.faixa_populacao, l.cobertura_aps_2021, l.regiao,
         -- desfecho
         f.situacao_encerramento
-    FROM casos_tuberculose.fnotificacao f
-    LEFT JOIN casos_tuberculose.dlocal l ON l.id_local = f.id_ocal_esidencia
-    LEFT JOIN casos_tuberculose.dtempo t ON t.id_tempo = f.id_tempo
+    FROM fnotificacao f
+    LEFT JOIN dlocal l ON l.id_local = f.id_ocal_esidencia
+    LEFT JOIN dtempo t ON t.id_tempo = f.id_tempo
     WHERE f.faixa_etaria != '<= 18 anos'
       AND f.imigrante != 'Sim'
       AND f.sem_teto != 'Sim'

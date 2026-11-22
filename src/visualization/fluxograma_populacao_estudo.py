@@ -25,7 +25,7 @@ CONSULTA_NOTIFICACOES = """
            gestante, forma_clinica, teste_sensibilidade,
            tempo_entre_encerramento_e_inicio_tratamento,
            situacao_encerramento
-    FROM casos_tuberculose.fnotificacao
+    FROM fnotificacao
 """
 
 RESISTENTES = [

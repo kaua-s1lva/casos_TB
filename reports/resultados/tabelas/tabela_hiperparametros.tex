@@ -1,0 +1,25 @@
+\begin{table}[H]
+    \centering
+    \caption{Hiperparâmetros selecionados pela validação cruzada em cada modelo e cenário.}
+    \label{tab-res-hiperparametros}
+    \footnotesize
+    \begin{tabular}{p{2.4cm} p{2.4cm} p{4.6cm} p{2.0cm} c}
+        \hline
+        \textbf{Modelo} & \textbf{Cenário} & \textbf{Hiperparâmetros escolhidos} & \textbf{Balanceamento} & \textbf{AUC na validação cruzada} \\
+        \hline
+        Regressão Logística & Só individuais & C = 0,1; regularização = L2 & pesos por classe & 0,699 ± 0,006 \\
+        Regressão Logística & Individuais + municipais & C = 0,1; regularização = L1 & pesos por classe & 0,711 ± 0,006 \\
+        Árvore de Decisão & Só individuais & critério = gini; profundidade = 10; mín. por folha = 200 & pesos por classe & 0,696 ± 0,006 \\
+        Árvore de Decisão & Individuais + municipais & critério = gini; profundidade = 10; mín. por folha = 500 & pesos por classe & 0,701 ± 0,005 \\
+        Random Forest & Só individuais & profundidade = 20; mín. por folha = 50 & pesos por classe & 0,702 ± 0,007 \\
+        Random Forest & Individuais + municipais & profundidade = 20; mín. por folha = 50 & pesos por classe & 0,719 ± 0,006 \\
+        MLP & Só individuais & alpha = 0,01; camadas ocultas = (32); taxa de aprendizado = 0,001 & subamostragem & 0,701 ± 0,006 \\
+        MLP & Individuais + municipais & alpha = 0,0001; camadas ocultas = (32); taxa de aprendizado = 0,001 & subamostragem & 0,716 ± 0,006 \\
+        XGBoost & Só individuais & taxa de aprendizado = 0,05; profundidade = 4 & pesos por classe & 0,703 ± 0,006 \\
+        XGBoost & Individuais + municipais & taxa de aprendizado = 0,1; profundidade = 4 & pesos por classe & 0,730 ± 0,004 \\
+        LightGBM & Só individuais & taxa de aprendizado = 0,05; máx. de folhas = 15 & pesos por classe & 0,702 ± 0,006 \\
+        LightGBM & Individuais + municipais & taxa de aprendizado = 0,05; máx. de folhas = 63 & pesos por classe & 0,730 ± 0,004 \\
+        \hline
+    \end{tabular}
+    \legend{Nota: AUC na validação cruzada = média ± desvio-padrão nas 10 partes do conjunto de treinamento.\\Fonte: elaborado pelo autor.}
+\end{table}

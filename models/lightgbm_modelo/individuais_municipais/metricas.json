@@ -1,0 +1,42 @@
+{
+  "modelo": "lightgbm_modelo",
+  "cenario": "Individuais + municipais",
+  "data_execucao": "2026-11-21 21:36",
+  "variaveis": [
+    "faixa_etaria",
+    "sexo",
+    "teste_hiv",
+    "alcool",
+    "tabagismo",
+    "drogas",
+    "escolaridade",
+    "raca",
+    "faixa_populacao",
+    "regiao",
+    "idhm",
+    "indice_gini",
+    "cobertura_aps_2021"
+  ],
+  "hiperparametros": {
+    "class_weight": "balanced",
+    "learning_rate": 0.05,
+    "num_leaves": 63
+  },
+  "balanceamento": "pesos por classe",
+  "auc_validacao_cruzada": 0.7302852945028941,
+  "auc_validacao_cruzada_desvio": 0.003696306303011957,
+  "limiar": 0.5,
+  "teste": {
+    "AUC": 0.7242093894806332,
+    "Sensibilidade": 0.6401641836424445,
+    "Especificidade": 0.6882449170366908,
+    "Precisão": 0.3107978448593992,
+    "F1-Score": 0.41844288766333776,
+    "Acurácia": 0.6795871999124031
+  },
+  "n_teste": 36531,
+  "versoes": {
+    "python": "3.13.4",
+    "scikit-learn": "1.9.1"
+  }
+}

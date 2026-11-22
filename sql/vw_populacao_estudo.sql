@@ -17,8 +17,8 @@ SELECT
     l.regiao,                -- região geográfica
     -- desfecho
     f.situacao_encerramento
-FROM casos_tuberculose.fnotificacao f
-LEFT JOIN casos_tuberculose.dlocal l
+FROM fnotificacao f
+LEFT JOIN dlocal l
        ON l.id_local = f.id_ocal_esidencia
 WHERE 1=1
 AND f.faixa_etaria != '<= 18 anos'

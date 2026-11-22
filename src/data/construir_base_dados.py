@@ -2,6 +2,8 @@
 Reconstrução da base de dados (ETL) — Seção 3.2 do TCC.
 Carrega as tabelas no MySQL a partir das fontes originais.
 
+  dtempo        <- data/raw/dTempo.csv (uma linha por data de notificação; precisa das
+                   colunas id_tempo e ano_notificacao)
   fnotificacao  <- data/raw/fNotificacao.csv (sem linhas duplicadas e com as chaves de
                    local redirecionadas para a dlocal sem duplicados)
   dlocal        <- data/raw/dLocal.csv (chaves, nomes, códigos,
@@ -18,7 +20,7 @@ import zipfile
 import numpy as np
 import pandas as pd
 from src.banco_dados import ConexaoBanco
-from src.config import ARQ_FATO, ARQ_DLOCAL, ARQ_ATLAS, ARQ_PACIENTES
+from src.config import ARQ_ATLAS, ARQ_DLOCAL, ARQ_DTEMPO, ARQ_FATO, ARQ_PACIENTES
 
 ANO_ATLAS = 2010
 
@@ -43,6 +45,19 @@ def carregar_notificacoes(db, mapa_locais):
         df[col] = novos.astype("int64")
 
     db.gravar_tabela(df, "fnotificacao")
+
+
+# ---------------------------------------------------------------------------
+# dTempo
+# ---------------------------------------------------------------------------
+def carregar_dimensao_tempo(db):
+    """Dimensão de datas de notificação (2018 a 2022), usada para obter o ano de cada
+    notificação na divisão treino/teste. O separador do CSV é detectado automaticamente."""
+    d = pd.read_csv(ARQ_DTEMPO, sep=None, engine="python", encoding="utf-8-sig")
+    faltando = {"id_tempo", "ano_notificacao"} - set(d.columns)
+    if faltando:
+        raise ValueError(f"{ARQ_DTEMPO.name}: colunas ausentes {sorted(faltando)}")
+    db.gravar_tabela(d, "dtempo")
 
 
 # ---------------------------------------------------------------------------
@@ -269,6 +284,8 @@ def montar_dimensao_local():
 
 def construir_base_dados():
     db = ConexaoBanco()
+    print("[*] Carregando a dTempo...")
+    carregar_dimensao_tempo(db)
     dlocal, mapa_locais = montar_dimensao_local()
     print("[*] Carregando a fNotificacao...")
     carregar_notificacoes(db, mapa_locais)

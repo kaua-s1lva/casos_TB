@@ -1,0 +1,19 @@
+\begin{table}[H]
+    \centering
+    \caption{AUC no conjunto de teste sem e com as variáveis do município de residência.}
+    \label{tab-res-cenarios}
+    \footnotesize
+    \begin{tabular}{l c c c c}
+        \hline
+        \textbf{Modelo} & \textbf{Só individuais} & \textbf{Individuais + municipais} & \textbf{Diferença (IC 95\%)} & \textbf{p-valor} \\
+        \hline
+        Regressão Logística & 0,698 (0,691–0,705) & 0,707 (0,700–0,713) & 0,008 (0,006–0,011) & < 0,001 \\
+        Árvore de Decisão & 0,696 (0,689–0,703) & 0,701 (0,694–0,707) & 0,004 (0,001–0,008) & 0,022 \\
+        Random Forest & 0,702 (0,695–0,709) & 0,716 (0,709–0,723) & 0,014 (0,011–0,017) & < 0,001 \\
+        MLP & 0,701 (0,694–0,708) & 0,713 (0,706–0,720) & 0,012 (0,009–0,015) & < 0,001 \\
+        XGBoost & 0,701 (0,695–0,708) & 0,724 (0,718–0,731) & 0,023 (0,019–0,027) & < 0,001 \\
+        LightGBM & 0,701 (0,694–0,708) & 0,724 (0,718–0,731) & 0,023 (0,019–0,027) & < 0,001 \\
+        \hline
+    \end{tabular}
+    \legend{Nota: AUC (IC 95\%); diferença = com municipais menos só individuais; IC e p-valor pelo teste de DeLong para curvas ROC pareadas.\\Fonte: elaborado pelo autor.}
+\end{table}
